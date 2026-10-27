@@ -1,0 +1,119 @@
+{
+  "_nota": "Catálogo fictício para demonstração e testes. Em produção, os dados vêm de um CatalogProvider (ex.: servidor MCP de catálogo).",
+  "restaurants": [
+    {
+      "id": "burger-lab",
+      "name": "Burger Lab",
+      "cuisine": "hamburgueria",
+      "delivery_fee": 7.99,
+      "min_order": 25.0,
+      "eta_min": 35,
+      "items": [
+        {"id": "bl-1", "name": "X-Burguer Clássico", "price": 28.9, "tags": [], "description": "pão brioche, blend 160g, queijo prato, alface, tomate e cebola"},
+        {"id": "bl-2", "name": "Smash Duplo Bacon", "price": 34.9, "tags": [], "description": "dois smash 90g, cheddar, bacon crocante"},
+        {"id": "bl-3", "name": "Burger de Grão-de-Bico", "price": 31.5, "tags": ["vegetariano", "vegano"], "description": "hambúrguer vegetal de grão-de-bico, maionese verde vegana"},
+        {"id": "bl-4", "name": "Batata Frita Média", "price": 16.0, "tags": ["vegetariano", "vegano", "sem_gluten"], "description": "porção de batata frita"},
+        {"id": "bl-5", "name": "Chicken Crispy", "price": 29.9, "tags": [], "description": "sanduíche de frango empanado crocante"}
+      ]
+    },
+    {
+      "id": "nonna-pizza",
+      "name": "Nonna Pizza",
+      "cuisine": "pizzaria",
+      "delivery_fee": 6.5,
+      "min_order": 30.0,
+      "eta_min": 45,
+      "items": [
+        {"id": "np-1", "name": "Pizza Margherita Individual", "price": 32.0, "tags": ["vegetariano"], "description": "molho de tomate, mussarela de búfala e manjericão"},
+        {"id": "np-2", "name": "Pizza Calabresa Individual", "price": 30.0, "tags": [], "description": "calabresa, cebola e azeitona"},
+        {"id": "np-3", "name": "Pizza Portuguesa Individual", "price": 35.0, "tags": [], "description": "presunto, ovo, cebola, ervilha e mussarela"},
+        {"id": "np-4", "name": "Calzone de Frango", "price": 33.0, "tags": [], "description": "frango com catupiry"},
+        {"id": "np-5", "name": "Pizza Vegana de Legumes", "price": 36.0, "tags": ["vegetariano", "vegano", "sem_lactose"], "description": "abobrinha, berinjela, pimentão e queijo vegetal"}
+      ]
+    },
+    {
+      "id": "sakura-sushi",
+      "name": "Sakura Sushi",
+      "cuisine": "japonesa",
+      "delivery_fee": 9.9,
+      "min_order": 40.0,
+      "eta_min": 50,
+      "items": [
+        {"id": "ss-1", "name": "Combo Sushi 16 peças", "price": 54.9, "tags": ["sem_lactose"], "description": "sushi variado de salmão e atum, japonês"},
+        {"id": "ss-2", "name": "Temaki de Salmão", "price": 29.9, "tags": ["sem_lactose"], "description": "temaki salmão com cebolinha"},
+        {"id": "ss-3", "name": "Yakissoba de Legumes", "price": 34.0, "tags": ["vegetariano", "vegano", "sem_lactose"], "description": "macarrão oriental com legumes"},
+        {"id": "ss-4", "name": "Hot Roll 10 peças", "price": 27.0, "tags": [], "description": "sushi empanado com cream cheese"}
+      ]
+    },
+    {
+      "id": "verde-bowl",
+      "name": "Verde Bowl",
+      "cuisine": "saudável",
+      "delivery_fee": 5.0,
+      "min_order": 20.0,
+      "eta_min": 30,
+      "items": [
+        {"id": "vb-1", "name": "Poke de Salmão", "price": 39.9, "tags": ["sem_lactose", "sem_gluten"], "description": "arroz, salmão, manga, pepino e gergelim"},
+        {"id": "vb-2", "name": "Salada Caesar com Frango", "price": 29.0, "tags": [], "description": "alface, frango grelhado, croutons e molho caesar"},
+        {"id": "vb-3", "name": "Bowl Vegano de Falafel", "price": 31.0, "tags": ["vegetariano", "vegano", "sem_lactose"], "description": "falafel, homus, quinoa e legumes"},
+        {"id": "vb-4", "name": "Wrap de Frango", "price": 24.9, "tags": [], "description": "wrap integral com frango e salada"}
+      ]
+    },
+    {
+      "id": "tempero-caseiro",
+      "name": "Tempero Caseiro",
+      "cuisine": "brasileira",
+      "delivery_fee": 4.0,
+      "min_order": 18.0,
+      "eta_min": 40,
+      "items": [
+        {"id": "tc-1", "name": "Prato Feito de Frango Grelhado", "price": 22.0, "tags": ["sem_gluten", "sem_lactose"], "description": "arroz, feijão, frango grelhado e salada, marmita"},
+        {"id": "tc-2", "name": "Feijoada Individual", "price": 29.0, "tags": ["sem_gluten"], "description": "feijoada completa com couve e farofa"},
+        {"id": "tc-3", "name": "Strogonoff de Carne", "price": 26.0, "tags": [], "description": "strogonoff com arroz e batata palha"},
+        {"id": "tc-4", "name": "Omelete com Salada", "price": 19.0, "tags": ["vegetariano", "sem_gluten"], "description": "omelete de queijo e tomate com salada"},
+        {"id": "tc-5", "name": "Parmegiana de Frango", "price": 31.0, "tags": [], "description": "filé de frango à parmegiana com arroz e fritas"}
+      ]
+    },
+    {
+      "id": "taco-loco",
+      "name": "Taco Loco",
+      "cuisine": "mexicana",
+      "delivery_fee": 8.0,
+      "min_order": 25.0,
+      "eta_min": 40,
+      "items": [
+        {"id": "tl-1", "name": "Burrito de Carne", "price": 32.0, "tags": [], "description": "tortilha, carne desfiada, feijão e queijo"},
+        {"id": "tl-2", "name": "Tacos de Frango (3 un)", "price": 27.0, "tags": [], "description": "tacos com frango, pico de gallo e guacamole"},
+        {"id": "tl-3", "name": "Burrito Vegano", "price": 30.0, "tags": ["vegetariano", "vegano", "sem_lactose"], "description": "feijão, arroz, legumes e guacamole"},
+        {"id": "tl-4", "name": "Nachos com Cheddar", "price": 22.0, "tags": ["vegetariano"], "description": "nachos com cheddar e jalapeño"}
+      ]
+    },
+    {
+      "id": "acai-da-praca",
+      "name": "Açaí da Praça",
+      "cuisine": "açaí e sobremesas",
+      "delivery_fee": 3.5,
+      "min_order": 15.0,
+      "eta_min": 25,
+      "items": [
+        {"id": "ap-1", "name": "Açaí 500ml", "price": 21.0, "tags": ["vegetariano", "vegano", "sem_lactose", "sem_gluten"], "description": "açaí com banana e granola"},
+        {"id": "ap-2", "name": "Açaí 700ml com Nutella", "price": 29.0, "tags": ["vegetariano"], "description": "açaí com nutella, leite em pó e morango"},
+        {"id": "ap-3", "name": "Brownie com Sorvete", "price": 18.0, "tags": ["vegetariano"], "description": "sobremesa brownie de chocolate com sorvete"}
+      ]
+    },
+    {
+      "id": "pastel-do-ze",
+      "name": "Pastel do Zé",
+      "cuisine": "lanches",
+      "delivery_fee": 5.5,
+      "min_order": 15.0,
+      "eta_min": 30,
+      "items": [
+        {"id": "pz-1", "name": "Pastel de Carne", "price": 12.0, "tags": [], "description": "pastel grande de carne moída"},
+        {"id": "pz-2", "name": "Pastel de Queijo", "price": 11.0, "tags": ["vegetariano"], "description": "pastel grande de queijo"},
+        {"id": "pz-3", "name": "Coxinha de Frango (4 un)", "price": 16.0, "tags": [], "description": "salgado coxinha de frango com catupiry"},
+        {"id": "pz-4", "name": "Caldo de Cana 500ml", "price": 8.0, "tags": ["vegetariano", "vegano", "sem_lactose", "sem_gluten"], "description": "bebida caldo de cana com limão"}
+      ]
+    }
+  ]
+}

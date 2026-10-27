@@ -1,0 +1,18 @@
+{
+  "group": [
+    {"id": "ana", "name": "Ana", "text": "gente, eu quero um hambúrguer vegano hoje"},
+    {"id": "bruno", "name": "Bruno", "text": "to afim de um smash com bacon"},
+    {"id": "carol", "name": "Carol", "text": "pizza margherita pra mim"},
+    {"id": "davi", "name": "Davi", "text": "qualquer coisa de frango, pode ser lanche"},
+    {"id": "elis", "name": "Elis", "text": "quero algo vegetariano, pode ser pizza"},
+    {"id": "fabio", "name": "Fábio", "text": "um x burguer sem cebola"}
+  ],
+  "private": [
+    {"id": "ana", "text": "meu limite é 40"},
+    {"id": "bruno", "text": "até 45 reais"},
+    {"id": "carol", "text": "R$ 38,00"},
+    {"id": "davi", "text": "35"},
+    {"id": "elis", "text": "50 no máximo"},
+    {"id": "fabio", "text": "32"}
+  ]
+}
