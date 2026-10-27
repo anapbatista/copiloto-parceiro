@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pedejunto"
+version = "0.1.0"
+description = "Agente de IA para pedidos em grupo: junta os desejos do grupo e otimiza em até 2 restaurantes respeitando o orçamento privado de cada pessoa."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Ana Paula de Abreu Batista" }]
+dependencies = []
+
+[project.optional-dependencies]
+llm = ["openai>=1.40"]
+mcp = ["mcp>=2"]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[tool.setuptools]
+packages = ["pedejunto"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]
