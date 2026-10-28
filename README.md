@@ -1,104 +1,74 @@
-# PedeJunto 🍔🍕 — agente de IA para pedidos em grupo
+# Copiloto do Parceiro 🛍️🤖
 
-[![CI](https://github.com/anapbatista/pedejunto-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/anapbatista/pedejunto-agent/actions/workflows/ci.yml)
+[![CI](https://github.com/anapbatista/copiloto-parceiro/actions/workflows/ci.yml/badge.svg)](https://github.com/anapbatista/copiloto-parceiro/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![MCP](https://img.shields.io/badge/MCP-server-8A2BE2)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-> Todo mundo já viveu isso: 8 pessoas num grupo de WhatsApp, cada uma quer uma coisa,
-> ninguém quer falar quanto pode gastar, e o pedido sai 1h depois — ou não sai.
+> Um lojista de marketplace recebe centenas de avaliações por mês. Ele não tem tempo de ler
+> todas — mas cada uma diz exatamente o que está fazendo ele perder venda.
 
-O **PedeJunto** é um agente que lê o que cada pessoa escreveu no grupo, recebe no
-**privado** o orçamento de cada uma e devolve um pedido **otimizado em até 2 restaurantes**,
-garantindo que ninguém paga mais do que o próprio limite (item + sua parte da taxa de entrega).
+O **Copiloto do Parceiro** lê as avaliações **reais** de clientes (37 mil, em português, do
+marketplace Olist), classifica sentimento e risco de atraso com modelos treinados e avaliados
+com rigor, descobre **por que** os clientes reclamam e entrega ao parceiro um **plano de ação**
+— com cada número e cada citação **verificados automaticamente** contra os dados.
 
-**Origem:** a ideia nasceu no **Hackathon iFood de Agentes de IA (SEMCOMP 2026, ICMC-USP)**, onde
-nosso time ficou em **4º lugar** construindo um agente + bot de WhatsApp sobre o MCP oficial do
-iFood. Este repositório é a minha reimplementação open source do núcleo do agente, reescrita do
-zero com foco em corretude do otimizador, avaliação e arquitetura plugável (catálogo fictício).
+Feito para o problema que todo marketplace (de produtos ou de comida) tem do lado do parceiro:
+transformar feedback bruto em ação, sem que a IA invente nada.
 
----
-
-## Demo
+## Exemplo de saída
 
 ```text
-=== GRUPO ===
-Ana: gente, eu quero um hambúrguer vegano hoje
-Bruno: to afim de um smash com bacon
-Carol: pizza margherita pra mim
-Davi: qualquer coisa de frango, pode ser lanche
-Elis: quero algo vegetariano, pode ser pizza
-Fábio: um x burguer sem cebola
+# Copiloto do Parceiro · `4a3ca931`
+Categoria: cama_mesa_banho · Período: 2017-01-08 a 2018-08-21 · Avaliações com texto: 820
 
-=== PRIVADO (só o bot vê) ===  ana: 40 | bruno: 45 | carol: 38 | davi: 35 | elis: 50 | fabio: 32
+## Como você está
+- Nota média 3,56; 26,8% das avaliações são negativas (mediana da categoria: 23,1%).
+- 14,4% dos pedidos chegaram depois do prazo prometido (mediana da categoria: 8,6%).
+- Nos últimos 3 meses a taxa de negativas melhorou: 18,2% (antes: 27,9%).
+- O modelo achou 15 avaliações com nota alta mas texto negativo: reclamações que a nota esconde.
 
-=== BOT NO GRUPO ===
-Pedido fechado em 2 restaurante(s):
-
-*Burger Lab* (chega em ~35 min)
-- Ana: Burger de Grão-de-Bico
-- Bruno: Smash Duplo Bacon
-- Davi: Chicken Crispy
-- Fábio: X-Burguer Clássico
-
-*Nonna Pizza* (chega em ~45 min)
-- Carol: Pizza Margherita Individual
-- Elis: Pizza Margherita Individual
-
-Os valores de cada um foram enviados no privado.
-
-=== BOT NO PRIVADO (Fábio) ===
-Item: R$ 28,90 + sua parte da entrega: R$ 2,00 = R$ 30,90.
-Dentro do seu limite de R$ 32,00 (sobram R$ 1,10).
+## O que mais gera reclamação (nota até 3)
+1. Pedido não recebido: 24,5% das reclamações (81 ocorrências).
+   > “Foi cobrado frete e a mercadoria não chegou até minha casa. Tive que retirar nos correios.”
+   - Ação: Acompanhar rastreio dos pedidos em aberto e acionar a transportadora antes do cliente reclamar.
+...
+modo: deterministico · fidelidade: OK (27 números, 3 citações verificados)
 ```
-
-Rode você mesma: `python -m pedejunto` (sem dependências externas).
 
 ## Arquitetura
 
 ```mermaid
 flowchart LR
-    G[Mensagens do grupo<br/>texto livre] --> P[IntentParser<br/>LLM com saída JSON<br/>ou regras offline]
-    D[Privado: orçamento<br/>de cada pessoa] --> S
-    P --> M[Matcher<br/>sinônimos + stemming<br/>+ fuzzy trigramas<br/>restrições = filtro duro]
-    C[(CatalogProvider<br/>JSON / servidor MCP)] --> M
-    M --> O[Otimizador exato<br/>≤ 2 restaurantes<br/>orçamento por pessoa<br/>pedido mínimo]
-    O --> S[Sessão]
-    S --> GM[Resumo no grupo<br/>sem valores]
-    S --> PM[Valores no privado<br/>de cada pessoa]
-    O -. exposto como ferramenta .-> MCP[[Servidor MCP<br/>planejar_pedido_em_grupo]]
+    D[(37 mil avaliações reais<br/>Olist, PT-BR)] --> M[Classificadores<br/>sentimento + risco de atraso<br/>TF-IDF baseline · BERTimbau]
+    D --> R[Motivos<br/>regras auditáveis]
+    M --> T[Ferramentas analíticas<br/>perfil · motivos · exemplos<br/>comparação com a categoria]
+    R --> T
+    T --> A{Copiloto}
+    A -->|offline| DT[Template determinístico]
+    A -->|tool calling| L[LLM compatível com OpenAI<br/>Groq, Gemini, OpenRouter, Ollama]
+    DT --> F[Verificador de fidelidade<br/>números e citações]
+    L --> F
+    F -->|ok| OUT[Plano de ação]
+    F -->|alucinou| DT
+    T -. exposto como .-> MCP[[Servidor MCP]]
 ```
+
+**Princípio: a IA interpreta, o código calcula.** Todas as métricas saem de funções testadas
+(`analytics.py`). O LLM só escolhe ferramentas e redige. Antes de entregar, o
+`faithfulness.py` confere cada número e cada trecho citado contra as saídas das ferramentas;
+se o LLM inventar algo, o copiloto devolve o relatório determinístico.
 
 | Módulo | Responsabilidade |
 |---|---|
-| `intent.py` | Extrai pratos, restrições (vegano, vegetariano, sem lactose, sem glúten) e exclusões ("sem cebola"). `LLMIntentParser` usa qualquer endpoint compatível com a API da OpenAI (OpenAI, Groq, Ollama, vLLM) com JSON validado e **fallback automático** para o parser de regras em caso de erro/timeout. |
-| `matching.py` | Score de aderência desejo → item em [0, 1]. Entende gíria ("japa", "x", "pf") e erro de digitação ("piza calabreza"). |
-| `optimizer.py` | Escolhe restaurantes e itens. Detalhes abaixo. |
-| `session.py` | Estado da conversa: mensagens do grupo, orçamentos privados, pendências, fechamento. |
-| `messages.py` | Mensagens de saída com **regra de privacidade**: o grupo nunca vê valores. |
-| `mcp_server.py` | Expõe o planejador como ferramenta MCP para Claude Desktop, Cursor ou outros agentes. |
-
-## O otimizador (a parte divertida)
-
-**Problema.** Cada pessoa recebe no máximo 1 item; o grupo usa no máximo K = 2 restaurantes; a
-taxa de entrega de cada restaurante é dividida igualmente entre quem pediu nele; o custo de cada
-pessoa não pode passar do seu orçamento; cada restaurante precisa atingir o pedido mínimo.
-Objetivo lexicográfico: **(1)** servir o máximo de pessoas, **(2)** maximizar
-`aderência − λ · custo/orçamento`.
-
-**O que torna difícil:** a parte da taxa de cada pessoa depende de *quantas* pessoas ficam no
-mesmo restaurante, então a restrição de orçamento é não-linear.
-
-**A sacada:** fixar os contadores. Para um par de restaurantes (A, B) e um número kA de pessoas
-em A, a taxa por pessoa vira constante e o problema se decompõe:
-
-1. **Caminho rápido (todos servidos):** escolher quais kA pessoas vão para A é exato ordenando
-   `uA − uB` (argumento de troca). Se a escolha gulosa quebra um pedido mínimo, busca exata entre
-   os C(n, kA) subconjuntos.
-2. **Fallback (orçamento não fecha para todos):** programação dinâmica sobre as pessoas com estado
-   `(a, b)`, permitindo deixar alguém sem pedido; a pessoa recebe no privado uma sugestão de ajuste.
-
-A corretude é verificada contra **força bruta** em cenários aleatórios (abaixo).
+| `data.py` | Baixa os dados públicos e cria os rótulos **reais**: sentimento (nota) e atraso (entrega real × prometida). |
+| `model.py` | Classificadores com **divisão temporal** (treino até fev/2018, validação mar/2018, teste abr–ago/2018). |
+| `reasons.py` | 8 motivos de reclamação com regras transparentes e ação recomendada para cada um. |
+| `analytics.py` | Ferramentas: perfil, motivos, exemplos literais e comparação com parceiros da mesma categoria. |
+| `agent.py` | Copiloto determinístico + agente com tool calling e *fallback* seguro. |
+| `faithfulness.py` | Eval de fidelidade: números e citações precisam existir nas evidências. |
+| `mcp_server.py` | As ferramentas como servidor MCP para Claude Desktop, Cursor ou outros agentes. |
+| `train/finetune.py` | Fine-tuning do BERTimbau com perda ponderada e publicação no Hugging Face Hub. |
 
 ## Avaliação
 
@@ -106,57 +76,60 @@ A corretude é verificada contra **força bruta** em cenários aleatórios (abai
 
 | Métrica | Resultado |
 |---|---|
-| Restrições alimentares (acurácia, 30 frases) | 100% |
-| Item certo no top-1 (30 frases) | 100% |
-| Planos ótimos vs. força bruta (300 cenários aleatórios) | 100% |
-| Violações de orçamento | 0 |
-| Violações do limite de 2 restaurantes | 0 |
-| Latência, 6 pessoas × 8 restaurantes (p50 / p95) | 48 ms / 58 ms |
-| Latência, 10 pessoas × 8 restaurantes (p50 / p95) | 95 ms / 127 ms |
-| Latência, 15 pessoas × 8 restaurantes (p50 / p95) | 337 ms / 426 ms |
+| Sentimento: macro-F1 / acurácia (12.061 avaliações de teste) | 0,668 / 0,826 |
+| Sentimento: F1 da classe negativa | 0,788 |
+| Risco de atraso pelo texto: ROC-AUC / PR-AUC (taxa base 6,2%) | 0,851 / 0,491 |
+| Regra "atraso/não recebido" vs. atraso real: precisão / recall | 0,408 / 0,542 |
+| Relatórios 100% fiéis aos dados (50 maiores parceiros) | 50/50 (1.347 números, 149 citações) |
+| Detecção de número inventado / citação inventada | 98% / 100% |
+| Latência para gerar um relatório (p50) | 34 ms |
 
-> Honestidade sobre os números: o conjunto de intenções é pequeno e foi escrito à mão sobre o
-> catálogo de exemplo — serve como teste de regressão, não como benchmark. O resultado mais forte
-> é o do otimizador, comparado com força bruta em cenários gerados aleatoriamente.
+O que esses números contam:
+
+- **Divisão temporal, não aleatória.** O modelo é treinado no passado e testado no futuro, como em produção.
+- **Drift real.** A taxa de atraso foi de 27,8% em mar/2018 (validação) para 6,2% no teste. O PR-AUC cai de 0,83
+  para 0,49 por isso — o ROC-AUC, que não depende da taxa base, fica estável. Em produção isso pede recalibrar o limiar.
+- **"Neutro" é a classe difícil** (nota 3 = avaliações mistas), por isso o macro-F1 fica abaixo da acurácia.
+- **A regra de atraso discorda do dado em parte por um motivo real:** muitos clientes avaliam *antes* de receber
+  ("ainda não chegou") mesmo quando a entrega acaba saindo no prazo.
+- **Detecção de 98%:** em 1 de 50 casos o número inventado coincidiu com um número verdadeiro do relatório.
+
+### Fine-tuning (BERTimbau → Hugging Face)
+
+O baseline TF-IDF roda em segundos e serve de piso. O `notebooks/finetune_colab.ipynb` ajusta o
+[BERTimbau](https://huggingface.co/neuralmind/bert-base-portuguese-cased) com a **mesma divisão temporal**
+(GPU T4 gratuita, ~15 min) e publica o modelo com *model card* e métricas no Hugging Face Hub.
 
 ## Como usar
 
 ```bash
-git clone https://github.com/anapbatista/pedejunto-agent && cd pedejunto-agent
-python -m pedejunto                      # demo offline
-pip install -e ".[dev,mcp]" && pytest    # 17 testes
-python evals/run_evals.py --markdown     # avaliação
+git clone https://github.com/anapbatista/copiloto-parceiro && cd copiloto-parceiro
+pip install -e ".[dev,mcp]"
+python -m copiloto.data            # baixa ~50 MB de dados públicos e cria os rótulos
+python -m copiloto.model           # treina o baseline (~15 s) e imprime as métricas
+python -m copiloto parceiros       # lista parceiros
+python -m copiloto relatorio 4a3ca9315b744ce9f8e9374361493884
+pytest                             # 19 testes (usam uma amostra, sem rede)
 
 # Com LLM (qualquer endpoint compatível com a API da OpenAI):
 pip install -e ".[llm]"
-export PEDEJUNTO_LLM_MODEL=gpt-4o-mini   # ou llama3.1 com PEDEJUNTO_LLM_BASE_URL=http://localhost:11434/v1
-python -m pedejunto
+export COPILOTO_LLM_MODEL=llama-3.3-70b-versatile COPILOTO_LLM_BASE_URL=https://api.groq.com/openai/v1 OPENAI_API_KEY=...
+python -m copiloto relatorio <seller_id>
 
 # Como servidor MCP (stdio):
-python -m pedejunto.mcp_server
+python -m copiloto.mcp_server
 ```
 
-Uso como biblioteca:
+## Limitações e próximos passos
 
-```python
-from pedejunto import GroupOrderSession
+- Dados de e-commerce de 2016–2018; o mesmo pipeline vale para avaliações de restaurantes quando houver dados rotulados.
+- Motivos por regras são auditáveis, mas têm cobertura limitada (64% das avaliações negativas recebem ao menos um motivo).
+  Próximo passo: anotar uma amostra e treinar um classificador multirrótulo de motivos.
+- [ ] Publicar o BERTimbau ajustado no Hugging Face e comparar com o baseline nesta tabela.
+- [ ] Avaliar o modo LLM em escala (taxa de *fallback* por modelo e custo por relatório).
 
-s = GroupOrderSession()
-s.on_group_message("ana", "Ana", "quero um temaki")
-s.on_private_message("ana", "meu limite é 40")
-result = s.close()
-print(result.group_text)
-```
+## Dados e licença
 
-## Próximos passos
-
-- [ ] Adaptador `CatalogProvider` para servidores MCP de catálogo reais.
-- [ ] Webhook do WhatsApp Cloud API (o `GroupOrderSession` já é o cérebro do bot).
-- [ ] Mais de um item por pessoa e itens compartilhados (ex.: pizza grande dividida).
-- [ ] Avaliar o `LLMIntentParser` em um conjunto maior de mensagens reais anonimizadas.
-
-## Créditos
-
-Ideia original desenvolvida em time no Hackathon iFood de Agentes (SEMCOMP 2026). Esta
-implementação é de autoria de [Ana Paula de Abreu Batista](https://www.linkedin.com/in/anapbatista-).
-Restaurantes e cardápios são fictícios.
+Código sob MIT. Dados: [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
+(CC BY-NC-SA 4.0, uso não comercial); a amostra em `tests/fixtures/` é derivada desse dataset.
+Autoria: [Ana Paula de Abreu Batista](https://www.linkedin.com/in/anapbatista-).
