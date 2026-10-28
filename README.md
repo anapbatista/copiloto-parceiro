@@ -94,11 +94,24 @@ O que esses números contam:
   ("ainda não chegou") mesmo quando a entrega acaba saindo no prazo.
 - **Detecção de 98%:** em 1 de 50 casos o número inventado coincidiu com um número verdadeiro do relatório.
 
-### Fine-tuning (BERTimbau → Hugging Face)
+### Fine-tuning: BERTimbau publicado no Hugging Face 🤗
 
-O baseline TF-IDF roda em segundos e serve de piso. O `notebooks/finetune_colab.ipynb` ajusta o
-[BERTimbau](https://huggingface.co/neuralmind/bert-base-portuguese-cased) com a **mesma divisão temporal**
-(GPU T4 gratuita, ~15 min) e publica o modelo com *model card* e métricas no Hugging Face Hub.
+Os dois classificadores foram ajustados a partir do [BERTimbau](https://huggingface.co/neuralmind/bert-base-portuguese-cased)
+com a **mesma divisão temporal** do baseline (GPU T4 no Colab, ~3 min por tarefa, perda ponderada pelas classes):
+
+| Tarefa (teste abr–ago/2018) | Baseline TF-IDF | BERTimbau ajustado | Modelo |
+|---|---|---|---|
+| Sentimento: macro-F1 / acurácia | 0,668 / 0,826 | **0,708 / 0,844** | [anapbatista/bertimbau-olist-sentimento](https://huggingface.co/anapbatista/bertimbau-olist-sentimento) |
+| Risco de atraso: ROC-AUC / PR-AUC / F1 | 0,851 / 0,491 / 0,530 | **0,861 / 0,581 / 0,603** | [anapbatista/bertimbau-olist-atraso](https://huggingface.co/anapbatista/bertimbau-olist-atraso) |
+
+```python
+from transformers import pipeline
+clf = pipeline("text-classification", model="anapbatista/bertimbau-olist-sentimento")
+clf("O produto chegou quebrado e ninguém responde.")  # [{'label': 'negativo', 'score': 0.90}]
+```
+
+O baseline continua no projeto porque treina em segundos, roda sem GPU e serve de piso para comparar.
+Reproduza com `notebooks/finetune_colab.ipynb`.
 
 ## Como usar
 
@@ -125,7 +138,8 @@ python -m copiloto.mcp_server
 - Dados de e-commerce de 2016–2018; o mesmo pipeline vale para avaliações de restaurantes quando houver dados rotulados.
 - Motivos por regras são auditáveis, mas têm cobertura limitada (64% das avaliações negativas recebem ao menos um motivo).
   Próximo passo: anotar uma amostra e treinar um classificador multirrótulo de motivos.
-- [ ] Publicar o BERTimbau ajustado no Hugging Face e comparar com o baseline nesta tabela.
+- [x] Publicar o BERTimbau ajustado no Hugging Face e comparar com o baseline.
+- [ ] Usar o BERTimbau no copiloto (hoje o agente usa o baseline, que roda em CPU).
 - [ ] Avaliar o modo LLM em escala (taxa de *fallback* por modelo e custo por relatório).
 
 ## Dados e licença
